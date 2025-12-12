@@ -1,0 +1,110 @@
+Perfect — now I see exactly what’s happening from your output.
+
+The **problem** is clear in simple words:
+
+---
+
+# **Issue**
+
+1. Your table headers are coming as:
+
+```
+????? ?? ??? ?? ??? ???
+```
+
+2. This happens because you are **translating English headers into Urdu**:
+
+```php
+$this->translate($header['label'], 'ur')
+```
+
+* Your JSON headers are English: `"Employee Name"`, `"Email"`, etc.
+* Nafees font **cannot display English text properly**.
+* Translating them via your translation function returns **Urdu text**, which works for some strings but may break table header rendering, or appear as gibberish (????).
+
+---
+
+# **Correct Approach (Step by Step)**
+
+---
+
+### **Step 1 — Table Header: Use English font + original English text**
+
+**Replace this code:**
+
+```php
+$pdf->SetFont('helvetica', 'B', 12);
+$table_html = '<table border="1" cellpadding="4"><tr>';
+foreach ($data['body']['table']['headers'] as $header) {
+    $table_html .= '<th>' . $this->translate($header['label'], 'ur') . '</th>';
+}
+$table_html .= '</tr>';
+```
+
+**With this code:**
+
+```php
+$pdf->SetFont('helvetica', 'B', 12); // English font for headers
+$table_html = '<table border="1" cellpadding="4"><tr>';
+foreach ($data['body']['table']['headers'] as $header) {
+    $table_html .= '<th>' . $header['label'] . '</th>'; // Use original English text
+}
+$table_html .= '</tr>';
+```
+
+✅ This ensures headers display correctly.
+
+---
+
+### **Step 2 — Table Rows: Switch back to Nafees for Urdu data**
+
+```php
+$pdf->SetFont($data['meta']['font'], '', 12); // Nafees for Urdu rows
+```
+
+Then generate rows:
+
+```php
+foreach ($data['body']['table']['rows'] as $row) {
+    $table_html .= '<tr>';
+    foreach ($data['body']['table']['headers'] as $header) {
+        $key = $header['key'];
+        $table_html .= '<td>' . $this->translate($row[$key], 'ur') . '</td>';
+    }
+    $table_html .= '</tr>';
+}
+```
+
+---
+
+### **Step 3 — Output table**
+
+```php
+$table_html .= '</table>';
+$pdf->writeHTML($table_html, true, false, false, false, '');
+```
+
+---
+
+# **Step 4 — Optional: Table title in Urdu**
+
+```php
+$pdf->SetFont($data['meta']['font'], 'B', 14);
+$pdf->Write(8, $this->translate($data['body']['table']['title'], 'ur'));
+$pdf->Ln(4);
+```
+
+---
+
+# **Result After This Fix**
+
+* Table headers → **visible in English** (`Employee Name`, `Email`, etc.)
+* Table rows → **Urdu translated** if needed
+* No more `????` gibberish
+* Table displays correctly in PDF
+
+---
+
+If you want, I can **rewrite your full `generatePDF()` function** with these fixes applied so you just **copy & paste** and it works perfectly.
+
+Do you want me to do that?

@@ -1,0 +1,165 @@
+Bilkul! 👍
+Main **Step 4: TCPDF Setup & PDF Create** ko **simple wording + step by step** explain karta hoon, taake aap easily samajh saken.
+
+---
+
+# **Step 4: TCPDF Setup & PDF Create — Simple Wording**
+
+---
+
+## **Step 4.1: TCPDF Instance Create Karna**
+
+```php
+$pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+```
+
+**Simple words:**
+
+* `'P'` → Portrait page
+* `'mm'` → Measurement in millimeters
+* `'A4'` → Page size
+* `'UTF-8'` → Text encoding
+* Ye line **PDF create kar rahi hai**.
+
+---
+
+## **Step 4.2: PDF Title & Font Set Karna**
+
+```php
+$pdf->SetTitle(translate($data['meta']['title'], 'ur'));
+$pdf->SetFont($data['meta']['font'], '', 12);
+```
+
+**Simple words:**
+
+* `SetTitle` → PDF ka title set kare
+* `SetFont` → PDF me font aur size set kare
+* Yaha translation function Urdu me apply ho raha hai.
+
+---
+
+## **Step 4.3: Page Add Karna**
+
+```php
+$pdf->AddPage();
+```
+
+**Simple words:**
+
+* Ek naya page PDF me add karo
+
+---
+
+## **Step 4.4: Header Text Add Karna**
+
+```php
+foreach($data['header']['items'] as $item) {
+    $pdf->Write(6, translate($item['value'], 'ur'), '', 0, 'L', true, 0, false, false, 0);
+}
+```
+
+**Simple words:**
+
+* Header me har line text show karo
+* Translation Urdu me apply karo
+* `6` → line height
+* `'L'` → text left align
+
+---
+
+## **Step 4.5: Hero Section Add Karna**
+
+```php
+if($data['hero_section']['enabled']) {
+    foreach($data['hero_section']['items'] as $item) {
+        $pdf->Write(6, translate($item['value'], 'ur'), '', 0, 'L', true, 0, false, false, 0);
+    }
+}
+```
+
+**Simple words:**
+
+* Hero section ek special box hota hai
+* Agar enabled hai to uske text lines PDF me show karo
+
+---
+
+## **Step 4.6: Body Table Add Karna**
+
+```php
+$table_html = '<table border="1" cellpadding="4"><tr>';
+foreach($data['body']['table']['headers'] as $header) {
+    $table_html .= '<th>' . translate($header['label'], 'ur') . '</th>';
+}
+$table_html .= '</tr>';
+foreach($data['body']['table']['rows'] as $row) {
+    $table_html .= '<tr>';
+    foreach($data['body']['table']['headers'] as $header) {
+        $key = $header['key'];
+        $table_html .= '<td>' . $row[$key] . '</td>';
+    }
+    $table_html .= '</tr>';
+}
+$table_html .= '</table>';
+$pdf->writeHTML($table_html, true, false, false, false, '');
+```
+
+**Simple words:**
+
+1. Table start karo (`<table>` tag)
+2. Table headers add karo
+3. Table rows add karo (JSON ke data se)
+4. `writeHTML` → PDF me table show karo
+
+---
+
+## **Step 4.7: Footer Add Karna**
+
+```php
+foreach($data['footer']['items'] as $item) {
+    if($item['type'] == 'text') {
+        $pdf->Write(6, translate($item['value'], 'ur'), '', 0, 'C', true, 0, false, false, 0);
+    }
+    if($item['type'] == 'logo') {
+        $pdf->Image(public_path($item['path']), '', '', 30, 15);
+    }
+}
+```
+
+**Simple words:**
+
+* Footer me **text** aur **logo** add karo
+* Text center align (`'C'`)
+* Logo ka size 30x15 mm
+
+---
+
+## **Step 4.8: PDF Output Karna**
+
+```php
+$pdf->Output('report.pdf', 'I');
+```
+
+**Simple words:**
+
+* PDF browser me open ho jayega
+* File name = `report.pdf`
+
+---
+
+✅ **Summary of Step 4 in Simple Words**
+
+1. TCPDF PDF create karo
+2. Title & Font set karo
+3. Page add karo
+4. Header text show karo
+5. Hero section text show karo
+6. Table body show karo
+7. Footer (text + logo) add karo
+8. PDF browser me output karo
+
+---
+
+Agar aap chaho to main **Step 5: Multi-Language PDF** version ready kar doon jisme **JSON ke text ko Urdu + English + aur languages me convert karke PDF generate karega automatically**.
+
+Kya main wo ready kar doon?
